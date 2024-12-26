@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -6,11 +6,16 @@ import (
 	"net/http"
 )
 
-func responseHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello From Microservice!")
+func returnHelloFromMicroService() string {
+	return "Hello From Microservice!"
 }
 
-func main() {
+func responseHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Incoming Request: ", r.Host)
+	fmt.Fprint(w, returnHelloFromMicroService())
+}
+
+func Server() {
 	fmt.Println("Starting Http Server :8080")
 	http.HandleFunc("/", responseHandler)
 

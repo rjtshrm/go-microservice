@@ -1,0 +1,41 @@
+trigger:
+ - main
+ - develop
+
+resources:
+  repositories:
+  - repository: az_pipelines
+    name: 'peng/az-pipelines-go'
+    type: 'git'
+    ref: 'refs/heads/main'
+
+variables:
+  repository: 'test-service'
+  tag: '$(Build.BuildId)'
+  go_version: '1.23.4'
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+    - template: go/jobs/build.yml@az_pipelines
+      parameters:
+        repository: $(repository)
+        tag: $(tag)
+
+- stage: Tests
+  displayName: Tests
+  jobs:
+    - template: go/jobs/tests.yml@az_pipelines
+      parameters:
+        GoVersion: $(go_version)
+
+- stage: Deploy
+  displayName: Deploy
+  jobs:
+    - template: go/jobs/deploy.yml@az_pipelines
+      parameters:
+        environment: 'staging'
+    - template: go/jobs/deploy.yml@az_pipelines
+      parameters:
+        environment: 'prod'
